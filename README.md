@@ -14,6 +14,13 @@
 
 `pdf-to-images`는 해당 폴더 전체를 내려받거나 팀원에게 전달하여 사용할 수 있습니다. 자세한 내용은 [사용 안내](pdf-to-images/README.md)를 참고하세요.
 
+## 문서 작성
+
+새 도구의 README를 작성할 때는 다음 문서를 사용하세요.
+
+- [README 작성 가이드](docs/README_GUIDE.md): 문서 구성, 단계 번호, 명령어와 참고 표시 규칙
+- [도구 README 템플릿](docs/templates/TOOL_README.md): 새 도구 폴더의 README.md로 복사할 기본 양식
+
 ## 구성 원칙
 
 - 도구별 코드, 사용 설명서, 의존성과 라이선스를 같은 폴더에 둡니다.
