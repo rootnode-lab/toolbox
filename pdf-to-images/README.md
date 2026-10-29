@@ -101,7 +101,14 @@ cd "C:\tools\pdf-to-images"
 
 - **`python` 명령을 찾지 못하면:** 설치 단계 1-2를 `py -m venv .venv`로 실행하세요. `py`도 없다면 Python을 먼저 설치하세요.
 - **`.\.venv\Scripts\python.exe`를 찾지 못하면:** 도구 폴더로 이동했는지, 최초 설치 단계 1-2를 완료했는지 확인하세요.
-- **PyMuPDF를 불러올 수 없으면:** 최초 설치 단계 1-3을 다시 실행하세요.
+- **PyMuPDF가 설치되지 않았다고 나오면:** 최초 설치 단계 1-3을 다시 실행하세요.
+- **설치 시 `Requirement already satisfied`가 나와도 변환이 실패하면:** 아래 명령으로 실제 로딩 오류를 확인하세요. 설치 완료 메시지는 PDF 변환에 필요한 DLL까지 정상적으로 실행된다는 뜻은 아닙니다.
+
+  ```powershell
+  .\.venv\Scripts\python.exe -c "import pymupdf"
+  ```
+
+- **`DLL load failed`와 `애플리케이션 제어 정책에서 이 파일을 차단했습니다`가 나오면:** Windows 보안 정책이 PyMuPDF의 실행 파일을 차단한 상태입니다. 마지막 줄의 `No module named 'mupdf'`보다 앞에 나온 DLL 오류를 확인하세요. 이벤트 뷰어 → 응용 프로그램 및 서비스 로그 → Microsoft → Windows → CodeIntegrity → Operational에서 이벤트 `3077`의 차단 파일 경로를 확인하고, 보안 정책 관리자에게 실행 허용을 요청하세요. 허용 후 위 명령이 오류 없이 끝나면 변환을 다시 실행합니다. 이 경우에는 `pip install`만 반복해도 해결되지 않습니다. [Microsoft의 이벤트 설명](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/event-id-explanations)을 참고하세요.
 - **PDF 파일을 찾지 못하면:** PDF의 전체 경로와 파일명, 확장자를 확인하세요.
 - **암호가 필요한 PDF라면:** 열기 암호를 해제한 사본을 사용하세요.
 

@@ -49,6 +49,38 @@ def positive_int(value):
     return number
 
 
+def load_pymupdf():
+    """미설치와 설치된 라이브러리의 DLL 로딩 실패를 구분한다."""
+    try:
+        import pymupdf
+    except (ImportError, OSError) as exc:
+        if isinstance(exc, ModuleNotFoundError) and exc.name == "pymupdf":
+            raise RuntimeError(
+                "PyMuPDF가 설치되지 않았습니다. 도구 폴더에서 설치: "
+                ".\\.venv\\Scripts\\python.exe -m pip install -r requirements.txt"
+            ) from exc
+
+        # PyMuPDF의 대체 import가 최초 DLL 오류를 가릴 수 있다.
+        causes = []
+        current = exc
+        seen = set()
+        while current is not None and id(current) not in seen:
+            seen.add(id(current))
+            causes.append(f"{type(current).__name__}: {current}")
+            current = current.__cause__ or (
+                None if current.__suppress_context__ else current.__context__
+            )
+        details = "\n    ".join(reversed(causes))
+        raise RuntimeError(
+            "PyMuPDF가 설치되어 있지만 불러오지 못했습니다.\n"
+            f"    {details}\n"
+            "    Windows에서 파일 차단 메시지가 나오면 이벤트 뷰어의 "
+            "Microsoft-Windows-CodeIntegrity/Operational 로그를 확인하고, "
+            "보안 정책 관리자에게 해당 파일의 실행 허용을 요청하세요."
+        ) from exc
+    return pymupdf
+
+
 def convert(pdf_path, dpi=300, fmt="png", out_dir=None, pages_spec=None):
     """PDF 한 개를 변환하고 출력 폴더 경로를 반환. 기존 출력 파일은 덮어쓴다."""
     pdf_path = Path(pdf_path).expanduser().resolve()
@@ -62,13 +94,7 @@ def convert(pdf_path, dpi=300, fmt="png", out_dir=None, pages_spec=None):
         raise ValueError("이미지 형식은 png 또는 jpg여야 합니다.")
 
     # 도움말과 페이지 지정 검증은 PyMuPDF 설치 전에도 사용할 수 있게 한다.
-    try:
-        import pymupdf as fitz
-    except ImportError as exc:
-        raise RuntimeError(
-            "PyMuPDF를 불러올 수 없습니다. 설치: "
-            "python -m pip install -r requirements.txt"
-        ) from exc
+    fitz = load_pymupdf()
 
     output = (
         Path(out_dir).expanduser().resolve()
